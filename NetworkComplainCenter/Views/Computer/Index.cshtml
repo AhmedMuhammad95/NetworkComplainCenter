@@ -1,0 +1,117 @@
+﻿@model NetworkComplainCenter.Models.ComputerResult
+@{
+    var computers = Model.Computers;
+    var ps = Model.PageSize;
+    var cp = Model.CurrentPage;
+    var total = Math.Ceiling((double)Model.TotalComputers / ps);
+
+    ViewBag.Title = "Index";
+}
+<script>
+    function GotoCreateComputerPage()
+    {
+        document.location.href = '/Computer/Create';
+    }
+</script>
+
+<div class="agile-grids">
+    <div class="w3l-table-info">
+        <h3>Computers</h3>
+        <div>
+            <button onclick="GotoCreateComputerPage();" class="hvr-icon-float-away col-10" style="height:50px">New Computer</button>
+        </div>
+            <div id="example_wrapper" class="dataTables_wrapper form-inline dt-bootstrap">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="dataTables_length" id="example_length">
+                            <label>Show <select name="example_length" aria-controls="example" class="form-control input-sm"><option value="10">10</option><option value="25">25</option><option value="50">50</option><option value="100">100</option></select> entries</label>
+                        </div>
+                    </div>
+                    <div class="w3l_search">
+                        @using (Html.BeginForm("Index", "User", FormMethod.Get))
+                        {
+                            <input type="text" name="keyword" placeholder="Search">
+                            <button class="btn btn-default" type="submit">
+                                <i class="fa fa-search" aria-hidden="true"></i>
+                            </button>
+                        }
+                    </div>
+                </div>
+             </div>  
+        @if (computers == null | computers.Count == 0)
+        {
+            <div>No complains found.</div>
+        }
+        else
+        {
+
+            <table id="table">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th><a href="@Url.Action("Index", new { sortBy = "Name" })"><span class="glyphicon glyphicon-sort-by-alphabet"></span></a> <a href="@Url.Action("Index", new { sortBy = "Name" })">Name</a></th>
+                        <th><a href="@Url.Action("Index", new { sortBy = "ComputerStatusId" })"><span class="glyphicon glyphicon-sort-by-alphabet"></span></a> <a href="@Url.Action("Index", new { sortBy = "ComputerStatusId" })">Status</a></th>
+                        <th><a href="@Url.Action("Index", new { sortBy = "LocationId" })"><span class="glyphicon glyphicon-sort-by-alphabet"></span></a> <a href="@Url.Action("Index", new { sortBy = "LocationId" })">Location</a></th>
+                        <th>Delete/Edit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in computers)
+                    {
+                        <tr role="row" class="even">
+
+                            <td class="sorting_1">@item.Id</td>
+                            <td>@item.Name</td>
+                            <td>@item.ComputerStatus.Name</td>
+                            <td>@item.Location.Name</td>
+                            <td>
+                                <a href="@Url.Action("Delete", new { Id = item.Id })"><span class="glyphicon glyphicon-remove">&nbsp;</span></a>  &nbsp;
+                                <a href="@Url.Action("Edit", new { Id = item.Id })"><span class="glyphicon glyphicon-edit">&nbsp;</span></a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <div class="w3l_search">
+                @{
+            var _totalrecords = 0;
+                }
+                @if (cp + 1 == total && (ps * total) > Model.TotalComputers)
+                {
+                    _totalrecords = Model.TotalComputers;
+                }
+                else
+                {
+                    _totalrecords = ps * (cp + 1);
+                }
+
+                <div class="dataTables_info" id="example_info" role="status" aria-live="polite">
+                    Showing @Html.Raw((ps * cp) + 1) to  @Html.Raw(_totalrecords) of @Model.TotalComputers entries
+                </div>
+            </div>
+            <ul class="pagination">
+                @if (cp > 0)
+                {
+                    <li class="paginate_button previous" id="example_previous">
+                        <a href="@Url.Action("Index", new { p = cp-1 })" aria-controls="example" data-dt-idx="0" tabindex="0">Previous</a>
+                    </li>
+                }
+
+
+                @for (int i = 0; i < total; i++)
+                {
+                    <li class="paginate_button">
+                        <a href="@Url.Action("Index", new { p = i })" aria-controls="example" data-dt-idx="1" tabindex="0">@Html.Raw(i + 1)</a>
+                    </li>
+                }
+
+                @if (cp < total - 1)
+                {
+                    <li class="paginate_button next" id="example_next">
+                        <a href="@Url.Action("Index", new { p = cp + 1 })" aria-controls="example" data-dt-idx="7" tabindex="0">Next</a>
+                    </li>
+                }
+            </ul>
+        }
+    </div>
+</div>
